@@ -21,7 +21,7 @@ pixelit:
   path: "/config/appdaemon/apps/pixelit/"
   entitiy_id: sensor.pixelit
 ```
-Parameter | 
+parameter | meaning
 ----------|----------
 ip|ip of the pixel controller
 path|path to the json templates
