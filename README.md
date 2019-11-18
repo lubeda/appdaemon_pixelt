@@ -71,7 +71,7 @@ create the templates acording to the wiki of pixelit and add these two values:
     "repeat": 10,
     "seconds": 15,
  ```
-Parameter | 
+parameter | meaning
 ----------|----------
 repeat|how often willthis screen be shown
 seconds|how long is this screen visible
@@ -86,7 +86,7 @@ with e.g.
 title: "alarm"
 message: "Door is open!"
 ```
-Parameter | 
+parameter | meaning
 ----------|----------
 title|selects the json template and is the screen name
 message|the text to display
@@ -95,7 +95,7 @@ message|the text to display
 
 *service:* rest_command.pixelit_delete
 
-Parameter | 
+parameter | meaning
 ----------|----------
 title|selects screen to delete first match is deleted, so unique screen names are useful
 
@@ -104,7 +104,7 @@ title|selects screen to delete first match is deleted, so unique screen names ar
 
 *service:* rest_command.pixelit_update
 
-Parameter | 
+parameter | meaning
 ----------|----------
 title|selects screen to update first match is used, so unique screen names are useful
 message: new display text
