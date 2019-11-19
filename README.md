@@ -108,7 +108,19 @@ parameter | meaning
 title|selects screen to update first match is used, so unique screen names are useful
 message: new display text
 
-#### special screen
+
+#### To update the color of a screen message text
+
+*service:* rest_command.pixelit_color
+
+parameter | meaning
+----------|----------
+title|selects screen to update first match is used, so unique screen names are useful
+r: red value 0..255
+g: green value 0..255
+b: blue value 0..255
+
+#### special screens
 
 The screen **alert** is special, it is display everysecond screen e.g. *screen1, alert, screen2, alert, screen3*
 you have to delete ist to disable this mode.

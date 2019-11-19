@@ -29,13 +29,26 @@ class pixelIT(hass.Hass):
       response = {"error": "message or title missing"}
       return response, 400
 
+  def rest_color(self,kwargs):
+    if self.debug: self.log("rest_color: " +str(kwargs))
+    try:
+      for msg in self.playlist:
+        if msg["screen"] == kwargs["title"]:
+          msg["text"]["color"]["r"] = kwargs["r"] 
+          msg["text"]["color"]["g"] = kwargs["g"]
+          msg["text"]["color"]["b"] = kwargs["b"]
+      return response, 200
+    except:
+      self.log("Unable to update color",level = "ERROR")
+      response = {"error": "screen not deleted"}
+
   def rest_sensor(self,kwargs):
     try: 
       r = {}
       r["state"]= len(self.playlist)
       return r, 200
     except:
-      self.log("Unable to return Sensordata",level = "ERROR")
+      self.log("Unable to return sensordata",level = "ERROR")
       return "Error", 400
 
   def rest_delete(self,kwargs):
@@ -84,6 +97,7 @@ class pixelIT(hass.Hass):
     self.register_endpoint(self.rest_add, "pixelit_add")
     self.register_endpoint(self.rest_delete, "pixelit_delete")
     self.register_endpoint(self.rest_update, "pixelit_update")
+    self.register_endpoint(self.rest_color, "pixelit_color")
     self.register_endpoint(self.rest_sensor, "pixelit_sensor")
     
     self.run_in(self.playlist_loop, 3)
