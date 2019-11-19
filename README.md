@@ -3,11 +3,11 @@ There is a marvelous project [PixelIT](https://www.bastelbunker.de/pixel-it/) wh
 The original developer provides a node-red flow to do so.
 
 ## Homeassistant
-I did not manage to feed data via node-red to the display so a started to develop an appdaemon class for this task. The result is in an early stage but is working
+I did not manage to feed data via node-red to the display so i started to develop an appdaemon class for this task. The result is in an early stage but is working
 
 ### concept
 
-The appdaemon show on "screen" after another. A screen is assembled from an json [template](https://wiki.dietru.de/books/pixel-it/page/apiscreen) to set static information like colors and a "dynamic" part the message. E.g. you can design a template for temperature with a special icon, text color and display duration an feed the actual value via home-assistant. Screennames should be unique if you update data dynamicaly
+The appdaemon show a "screen" after another. A screen is assembled from an json [template](https://wiki.dietru.de/books/pixel-it/page/apiscreen) to set static information like colors and a "dynamic" part the message. E.g. you can design a template for temperature with a special icon, text color and display duration and feed the actual value via home-assistant. Screennames should be unique if you update data dynamicaly.
 
 ### setup
 
@@ -62,18 +62,18 @@ rest_command:
     payload: '{"title": "{{ title }}","message": "{{ message }}"}'
     content_type:  'application/json; charset=utf-8'
 ```
-**user your own ip!!!**
+**user your own ip instead of 192...47!!!**
 
 ### usage
 
-create the templates acording to the wiki of pixelit and add these two values:
+create the templates according to the wiki of pixelit and add these two values:
 ```json
     "repeat": 10,
     "seconds": 15,
  ```
 parameter | meaning
 ----------|----------
-repeat|how often willthis screen be shown
+repeat|how often will this screen be shown
 seconds|how long is this screen visible
  
 name the json-files according to your screen an put it in the defined path.
@@ -88,7 +88,7 @@ message: "Door is open!"
 ```
 parameter | meaning
 ----------|----------
-title|selects the json template and is the screen name
+title|selects the "*title*.json" template and equals the screen name
 message|the text to display
 
 #### To delete a screen from the playlist
@@ -98,7 +98,6 @@ message|the text to display
 parameter | meaning
 ----------|----------
 title|selects screen to delete first match is deleted, so unique screen names are useful
-
 
 #### To update a screen message text
 
