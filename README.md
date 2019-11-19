@@ -1,4 +1,4 @@
-# HA_appdaemon_pixelt
+# appdaemon_pixelt
 There is a marvelous project [PixelIT](https://www.bastelbunker.de/pixel-it/) which is a 8x32bit RGB LED matrix to display text and graphics. The screen is more or less dumb, you have to feed it with data by a server.
 The original developer provides a node-red flow to do so.
 
@@ -107,3 +107,11 @@ parameter | meaning
 ----------|----------
 title|selects screen to update first match is used, so unique screen names are useful
 message: new display text
+
+#### special screen
+
+The screen **alert** is special, it is display everysecond screen e.g. *screen1, alert, screen2, alert, screen3*
+you have to delete ist to disable this mode.
+
+The second special screen is "clock" here is a clock displayed without a message-text.
+
