@@ -1,0 +1,20 @@
+{
+  "repeat": 10,
+  "seconds": 5,
+  "brightness":90,
+  "text":{ 
+    "textString":"data",
+    "bigFont": false,
+    "scrollText":"auto",
+    "scrollTextDelay": 100,
+      "position":{
+        "x":8,
+        "y":1
+      },
+      "color":{
+          "r":160,
+          "g":160,
+          "b":160
+      }
+  }   
+}
