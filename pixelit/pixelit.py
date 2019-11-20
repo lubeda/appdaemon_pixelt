@@ -21,8 +21,12 @@ class pixelIT(hass.Hass):
       data = self.load_template(kwargs["title"]+".json")
       if len(kwargs["message"]) and (kwargs["title"] != "clock"):
         data["text"]["textString"] = kwargs["message"] 
+        if self.debug: self.log("alertmodus: " +str(kwargs))
+      if kwargs.get("target") != None:
+        data["target"] = kwargs["target"]
+        if data["target"] == "warning": data["repeat"] *= 2
       self.playlist_add(data)
-      response = {"playlist": len(self.playlist)}
+      response = {"length playlist": len(self.playlist)}
       return response, 200
     except:
       self.log("Unable to add screen",level = "ERROR")
@@ -51,15 +55,22 @@ class pixelIT(hass.Hass):
       self.log("Unable to return sensordata",level = "ERROR")
       return "Error", 400
 
+  def rest_playlist(self,kwargs):
+    return self.playlist, 200
+
   def rest_delete(self,kwargs):
     if self.debug: self.log("rest_delete: "+str(kwargs))
+    if self.alertMsg != None:
+      if self.debug: self.log("rest_delete: alert")
+      if self.alertMsg["screen"] == kwargs["title"]: self.alertMsg = None
+    if self.warningMsg != None:
+      if self.debug: self.log("rest_delete: warning")
+      if self.warningMsg["screen"] == kwargs["title"]: self.warningMsg = None
     try:
-      if kwargs["title"] == "alert":
-        self.alertMsg = None
-        self.log("delete alert: "+str(kwargs))
       for msg in self.playlist:
         if msg["screen"] == kwargs["title"]:
           self.log("delete found "+ kwargs["title"] + " len: " + str(len(self.playlist)))
+          if msg.get("target") == "alert": self.alertMsg = None
           self.playlist.remove(msg)
       response = {"playlist": len(self.playlist)}
       return response, 200
@@ -90,40 +101,39 @@ class pixelIT(hass.Hass):
     self.url = 'http://' + self.args["ip"] + '/api/screen'
     self.log(self.url)
     self.playlist= []
-    self.debug = False
+    self.debug = True
     self.pointer = 0
     self.showAlert = True
     self.alertMsg = None
+    self.warningMsg = None
     self.register_endpoint(self.rest_add, "pixelit_add")
     self.register_endpoint(self.rest_delete, "pixelit_delete")
     self.register_endpoint(self.rest_update, "pixelit_update")
     self.register_endpoint(self.rest_color, "pixelit_color")
     self.register_endpoint(self.rest_sensor, "pixelit_sensor")
-    
-    self.run_in(self.playlist_loop, 3)
+    if self.debug: self.register_endpoint(self.rest_playlist, "pixelit_playlist")
+    self.nextLoop = self.run_in(self.playlist_loop, 3)
 
-  def request(self,msg):
+  def display(self,msg):
+    if self.debug: self.log("display: " + json.dumps(msg))
     try: 
-      if self.debug: self.log("request: " + json.dumps(msg))
       r = requests.post(self.url,data=json.dumps(msg), headers={'Content-Type': 'application/data'})
-      if self.debug: self.log("RC request: " +r.text)
+      if self.debug: self.log("display return: " +r.text)
     except:
-      self.log("Error in request",level="ERROR")
+      self.log("Error while sending to display.",level="ERROR")
 
-  def playlist_alert(self,msg):
-    if msg is None:
-      self.alertMsg= None
-    else:
-      if self.debug: self.log("alert: " +msg["text"]["textString"])
-      msg["seconds"] = 15
-      self.alertMsg = msg
-  
   def playlist_add(self,msg):
     try: 
       if msg["seconds"] < 5:
         msg["seconds"] = 5
-      if msg["screen"] == "alert":
-        self.playlist_alert(msg)
+      if msg.get("target") == "alert":
+        if self.debug: self.log("alert: " +msg["text"]["textString"])
+        msg["seconds"] = 20
+        self.alertMsg = msg
+        self.cancel_timer(self.nextLoop)
+        self.nextLoop = self.run_in(self.playlist_loop, 1)
+      elif msg.get("target") == "warning":
+        self.warningMsg = msg
       else:
         self.playlist.append(msg)
     except:
@@ -134,8 +144,14 @@ class pixelIT(hass.Hass):
     self.showAlert = not self.showAlert
     if (self.alertMsg is not None) and self.showAlert:
       if self.debug: self.log("Show alert")
-      self.request(self.alertMsg)
-      self.run_in(self.playlist_loop, self.alertMsg["seconds"])
+      self.display(self.alertMsg)
+      self.nextLoop = self.run_in(self.playlist_loop, self.alertMsg["seconds"])
+      return
+    if (self.warningMsg is not None) and not self.showAlert:
+      if self.debug: self.log("Show warning")
+      self.display(self.warningMsg)
+      if (self.warningMsg["repeat"] > 0): self.warningMsg["repeat"] -= 1
+      self.nextLoop = self.run_in(self.playlist_loop, self.warningMsg["seconds"])
       return
     if len(self.playlist) > 0:
       nowPlay = self.pointer
@@ -149,8 +165,8 @@ class pixelIT(hass.Hass):
         status = self.set_state(self.args["entitiy_id"], state =len(self.playlist) , attributes = {"screen": self.playlist[nowPlay]["screen"]})
       except:
         status = None        
-      self.request(self.playlist[nowPlay])
-      self.run_in(self.playlist_loop, self.playlist[nowPlay]["seconds"])
+      self.display(self.playlist[nowPlay])
+      self.nextLoop = self.run_in(self.playlist_loop, self.playlist[nowPlay]["seconds"])
       if self.playlist[nowPlay]["repeat"] == 0:
         if self.debug: self.log("last time: "+self.playlist[nowPlay]["text"]["textString"])
         self.playlist.pop(nowPlay)
@@ -161,4 +177,4 @@ class pixelIT(hass.Hass):
       self.pointer = nowPlay
     else:
       self.playlist_add(self.load_template("clock.json"))
-      self.run_in(self.playlist_loop, 10)
+      self.nextLoop = self.run_in(self.playlist_loop, 10)

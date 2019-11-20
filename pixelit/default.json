@@ -3,10 +3,6 @@
     "seconds": 10,
     "sleepMode": false ,
 	"brightness":10,
-    "switchAnimation":{ 
-        "aktiv": true, 
-        "animation": "colorwipe" 
-    },
     "bitmap":{ 
         "data":[0,0,0,0,0,0,0,0,0,65535,0,65535,65535,0,0,0,0,65535,65535,65535,65535,65535,0,0,0,65535,65535,0,0,65535,65535,0,65535,65535,0,0,0,0,65535,65535,0,65535,0,63488,63488,0,65535,0,0,65535,0,63488,63488,0,65535,0,0,65535,0,63488,63488,0,65535,0],
         "position":{
@@ -23,7 +19,6 @@
       "bigFont": false,
       "scrollText":"auto",
       "scrollTextDelay": 50,
-      "centerText":true,          
         "position":{
             "x":8,
             "y":1
