@@ -1,5 +1,5 @@
 # appdaemon_pixelt
-There is a marvelous project [PixelIT](https://www.bastelbunker.de/pixel-it/) which is a 8x32bit RGB LED matrix to display text and graphics. The screen is more or less dumb, you have to feed it with data by a server.
+There is a marvelous project [PixelIT](https://www.bastelbunker.de/pixel-it/) which is a 8x32bit RGB LED matrix to display text and graphics. The screen is more or less dumb, you have to feed it with data by a server for around 50€.
 The original developer provides a node-red flow to do so.
 
 ## Homeassistant
@@ -126,4 +126,10 @@ The screen **alert** is special, it is display everysecond screen e.g. *screen1,
 you have to delete ist to disable this mode.
 
 The second special screen is "clock" here is a clock displayed without a message-text.
+
+#### on screen names
+
+You may use screen-names multiple times but if you e.g. delete this screen all screens of that name will be delete.
+
+
 
