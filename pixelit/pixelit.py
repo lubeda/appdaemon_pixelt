@@ -23,8 +23,6 @@ class pixelIT(hass.Hass):
         data["text"]["textString"] = kwargs["message"] 
       if kwargs.get("target") != None:
         data["target"] = kwargs["target"]
-        if data["target"] == "alert":
-          
         if data["target"] == "warning": data["repeat"] *= 2
       self.playlist_add(data)
       response = {"length playlist": len(self.playlist)}
