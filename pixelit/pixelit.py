@@ -21,9 +21,10 @@ class pixelIT(hass.Hass):
       data = self.load_template(kwargs["title"]+".json")
       if len(kwargs["message"]) and (kwargs["title"] != "clock"):
         data["text"]["textString"] = kwargs["message"] 
-        if self.debug: self.log("alertmodus: " +str(kwargs))
       if kwargs.get("target") != None:
         data["target"] = kwargs["target"]
+        if data["target"] == "alert":
+          
         if data["target"] == "warning": data["repeat"] *= 2
       self.playlist_add(data)
       response = {"length playlist": len(self.playlist)}
@@ -80,18 +81,24 @@ class pixelIT(hass.Hass):
       return response, 400  
 
   def rest_update(self,kwargs):
+    found = False
     if self.debug: self.log("rest_update: " + str(kwargs))
     try:
       for msg in self.playlist:
         if msg["screen"] == kwargs["title"]:
+          found = True
           for key in kwargs:
-            if key== "message":
+            if key=="message":
               msg["text"]["textString"] = kwargs["message"]
             elif key != "title":
               if self.debug: self.log("update key: "+ key +" " + str(kwargs[key]))
               msg[key]= {**msg[key] , **kwargs[key]} 
       response = {"playlist": len(self.playlist)}
-      return response, 200
+      if found:
+        return response, 200
+      else:
+        self.rest_add(kwargs)
+        return response, 200
     except:
       self.log("Unable to update screen",level = "ERROR")
       response = {"error": "screen not deleted"}

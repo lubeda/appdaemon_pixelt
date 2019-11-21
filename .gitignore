@@ -1,3 +1,7 @@
 
 *.pyc
 pixelit/pixelit copy.py
+pixelit/fuel.json
+pixelit/garage.json
+pixelit/rain.json
+pixelit/temperatur.json
