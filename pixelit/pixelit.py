@@ -32,7 +32,7 @@ class pixelIT(hass.Hass):
       response = {"error": "message or title missing"}
       return response, 400
 
-  def rest_color(self,kwargs):
+  def rest_update_color(self,kwargs):
     if self.debug: self.log("rest_color: " +str(kwargs))
     try:
       for msg in self.playlist:
@@ -78,19 +78,17 @@ class pixelIT(hass.Hass):
       response = {"error": "screen not deleted"}
       return response, 400  
 
-  def rest_update(self,kwargs):
+  def rest_update_message(self,kwargs):
     found = False
-    if self.debug: self.log("rest_update: " + str(kwargs))
+    if self.debug: self.log("rest_update_message: " + str(kwargs))
     try:
       for msg in self.playlist:
         if msg["screen"] == kwargs["title"]:
           found = True
+          template = self.load_template(kwargs["title"]+".json")
           for key in kwargs:
             if key=="message":
-              msg["text"]["textString"] = kwargs["message"]
-            elif key != "title":
-              if self.debug: self.log("update key: "+ key +" " + str(kwargs[key]))
-              msg[key]= {**msg[key] , **kwargs[key]} 
+              template["text"]["textString"] = kwargs["message"]
       response = {"playlist": len(self.playlist)}
       if found:
         return response, 200
@@ -113,8 +111,8 @@ class pixelIT(hass.Hass):
     self.warningMsg = None
     self.register_endpoint(self.rest_add, "pixelit_add")
     self.register_endpoint(self.rest_delete, "pixelit_delete")
-    self.register_endpoint(self.rest_update, "pixelit_update")
-    self.register_endpoint(self.rest_color, "pixelit_color")
+    self.register_endpoint(self.rest_update_message, "pixelit_update_message")
+    self.register_endpoint(self.rest_update_color, "pixelit_update_color")
     self.register_endpoint(self.rest_sensor, "pixelit_sensor")
     if self.debug: self.register_endpoint(self.rest_playlist, "pixelit_playlist")
     self.nextLoop = self.run_in(self.playlist_loop, 3)
@@ -170,6 +168,7 @@ class pixelIT(hass.Hass):
         status = self.set_state(self.args["entitiy_id"], state =len(self.playlist) , attributes = {"screen": self.playlist[nowPlay]["screen"]})
       except:
         status = None        
+      
       self.display(self.playlist[nowPlay])
       self.nextLoop = self.run_in(self.playlist_loop, self.playlist[nowPlay]["seconds"])
       if self.playlist[nowPlay]["repeat"] == 0:

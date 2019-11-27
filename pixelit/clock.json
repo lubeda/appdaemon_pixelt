@@ -1,6 +1,6 @@
 {
     "repeat": 10,
-    "seconds": 15,
+    "seconds": 12,
     "brightness":10,
     "text":{ 
         "textString":"",
@@ -19,7 +19,7 @@
     },
     "clock":{ 
         "show": true,
-        "switchAktiv": false,
-            "switchSec": 1
+        "switchAktiv": true,
+            "switchSec": 3
     }
 }
