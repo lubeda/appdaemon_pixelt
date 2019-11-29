@@ -4,7 +4,7 @@
     "brightness":10,
     "text":{ 
         "textString":"",
-        "bigFont": false,
+        "bigFont": true,
         "scrollText": false,
         "scrollTextDelay": 100,
           "position":{

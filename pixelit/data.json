@@ -1,10 +1,10 @@
 {
   "repeat": 10,
-  "seconds": 5,
+  "seconds": 7,
   "brightness":90,
   "text":{ 
     "textString":"data",
-    "bigFont": false,
+    "bigFont": true,
     "scrollText":"auto",
     "scrollTextDelay": 100,
       "position":{

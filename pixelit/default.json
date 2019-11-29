@@ -15,10 +15,10 @@
         }
     },
    "text":{ 
-     "textString":"default",
-      "bigFont": false,
-      "scrollText":"auto",
-      "scrollTextDelay": 50,
+    "textString":"default",
+    "bigFont": true,
+    "scrollText":"auto",
+    "scrollTextDelay": 50,
         "position":{
             "x":8,
             "y":1

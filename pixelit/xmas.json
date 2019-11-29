@@ -11,7 +11,7 @@
         },
    "text":{ 
      "textString":"default",
-      "bigFont": false,
+      "bigFont": true,
       "scrollText":"auto",
       "scrollTextDelay": 50,
         "position":{

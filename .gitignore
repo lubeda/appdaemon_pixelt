@@ -16,3 +16,9 @@ pixelit/rgb565.py
 pixelit/xmas.json
 pixelit/2586.gif
 pixelit/door.json
+*.gif
+pixelit/tv.json
+pixelit/wind.json
+pixelit/xmas.json
+*.png
+pixelit/xmas.json

@@ -1,5 +1,5 @@
 {
-  "repeat": 3,
+  "repeat": 8,
   "seconds": 10,
   "brightness":20,
     "bitmap":{ 
@@ -15,9 +15,10 @@
     },
    "text":{ 
       "textString":"temp",
+      "bigFont": false,
       "centerText": true,
       "position":{
-          "x":8,
+          "x":12,
           "y":1
       },
       "color":{

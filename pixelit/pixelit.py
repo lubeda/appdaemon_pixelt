@@ -55,6 +55,11 @@ class pixelIT(hass.Hass):
       return "Error", 400
 
   def rest_playlist(self,kwargs):
+    retval = self.playlist
+    if self.alertMsg != None:
+      retval += self.alertMsg
+    if self.warningMsg != None:
+      retval += self.warningMsg  
     return self.playlist, 200
 
   def rest_delete(self,kwargs):
@@ -143,18 +148,26 @@ class pixelIT(hass.Hass):
       self.log("Unable to add to playlist",level="ERROR")
 
   def playlist_loop(self, kwargs):
-    
+    if self.debug: self.log("Loop")
     self.showAlert = not self.showAlert
     if (self.alertMsg is not None) and self.showAlert:
       if self.debug: self.log("Show alert")
       self.display(self.alertMsg)
       self.nextLoop = self.run_in(self.playlist_loop, self.alertMsg["seconds"])
+      if (self.AlertMsg["repeat"] > 0): 
+        self.AlertMsg["repeat"] -= 1
+      else:
+        self.AlertMsg=None  
       return
     if (self.warningMsg is not None) and not self.showAlert:
       if self.debug: self.log("Show warning")
       self.display(self.warningMsg)
-      if (self.warningMsg["repeat"] > 0): self.warningMsg["repeat"] -= 1
       self.nextLoop = self.run_in(self.playlist_loop, self.warningMsg["seconds"])
+      if (self.warningMsg["repeat"] > 0): self.warningMsg["repeat"] -= 1
+      if (self.warningMsg["repeat"] > 0): 
+        self.warningMsg["repeat"] -= 1
+      else:
+        self.warningMsg=None  
       return
     if len(self.playlist) > 0:
       nowPlay = self.pointer
@@ -163,19 +176,16 @@ class pixelIT(hass.Hass):
       if self.debug: self.log("show MSG: "+ self.playlist[nowPlay]["screen"] + " " + str(nowPlay) + "/" +str(len(self.playlist)))
       if (self.playlist[nowPlay]["repeat"] > 0) and (self.playlist[nowPlay]["screen"] != "clock"):
         self.playlist[nowPlay]["repeat"] -= 1
-
       try:
         status = self.set_state(self.args["entitiy_id"], state =len(self.playlist) , attributes = {"screen": self.playlist[nowPlay]["screen"]})
       except:
         status = None        
-      
       self.display(self.playlist[nowPlay])
       self.nextLoop = self.run_in(self.playlist_loop, self.playlist[nowPlay]["seconds"])
       if self.playlist[nowPlay]["repeat"] == 0:
         if self.debug: self.log("last time: "+self.playlist[nowPlay]["text"]["textString"])
         self.playlist.pop(nowPlay)
         if self.debug: self.log("playlist length =>"+str(len(self.playlist)))
-      
       if nowPlay < len(self.playlist):
         nowPlay+=1
       self.pointer = nowPlay
