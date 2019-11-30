@@ -15,6 +15,16 @@ class pixelIT(hass.Hass):
       self.log("Template not found: "+name,level = "ERROR")
       return None
 
+  def push_config(self):
+    try: 
+      fp = open(self.args["path"]+"pixelit_config.json","r")
+      data = json.load(fp)
+      requests.post('http://' + self.args["ip"] + '/api/config',data=json.dumps(data), headers={'Content-Type': 'application/data'})
+      if self.debug: self.log("Hardware Initialized")
+    except:
+      self.log("Hardware Initialized failed",level = "ERROR")
+      return None
+
   def rest_add(self,kwargs):
     if self.debug: self.log("pixelit_add: " +str(kwargs))
     try:
@@ -30,6 +40,17 @@ class pixelIT(hass.Hass):
     except:
       self.log("Unable to add screen",level = "ERROR")
       response = {"error": "message or title missing"}
+      return response, 400
+
+  def rest_sleepmode(self,kwargs):
+    if self.debug: self.log("pixelit_sleepmode: " +str(kwargs))
+    try:
+      if kwargs.get("sleepMode") != None:
+        response = self.display(kwargs)
+        return response, 200
+    except:
+      self.log("Unable to set sleepmode",level = "ERROR")
+      response = {"error": "no sleepmode provided"}
       return response, 400
 
   def rest_update_color(self,kwargs):
@@ -110,17 +131,21 @@ class pixelIT(hass.Hass):
     self.log(self.url)
     self.playlist= []
     self.debug = True
+    self.sleepMode = False
+    self.rest_sleepmode({"sleepMode":self.sleepMode})
     self.pointer = 0
     self.showAlert = True
     self.alertMsg = None
     self.warningMsg = None
     self.register_endpoint(self.rest_add, "pixelit_add")
+    self.register_endpoint(self.rest_sleepmode, "pixelit_sleepmode")
     self.register_endpoint(self.rest_delete, "pixelit_delete")
     self.register_endpoint(self.rest_update_message, "pixelit_update_message")
     self.register_endpoint(self.rest_update_color, "pixelit_update_color")
     self.register_endpoint(self.rest_sensor, "pixelit_sensor")
     if self.debug: self.register_endpoint(self.rest_playlist, "pixelit_playlist")
-    self.nextLoop = self.run_in(self.playlist_loop, 3)
+    self.push_config()
+    self.nextLoop = self.run_in(self.playlist_loop, 1)
 
   def display(self,msg):
     if self.debug: self.log("display: " + json.dumps(msg))

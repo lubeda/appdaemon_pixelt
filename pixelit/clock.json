@@ -1,7 +1,6 @@
 {
     "repeat": 10,
     "seconds": 12,
-    "brightness":10,
     "text":{ 
         "textString":"",
         "bigFont": true,

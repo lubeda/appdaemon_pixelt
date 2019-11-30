@@ -1,7 +1,6 @@
 {
   "repeat": 10,
   "seconds": 7,
-  "brightness":90,
   "text":{ 
     "textString":"data",
     "bigFont": true,
