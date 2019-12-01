@@ -1,6 +1,6 @@
 {
   "repeat": 10,
-  "seconds": 7,
+  "lifetime": 7,
   "text":{ 
     "textString":"data",
     "bigFont": true,

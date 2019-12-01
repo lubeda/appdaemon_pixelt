@@ -25,6 +25,12 @@ class pixelIT(hass.Hass):
       self.log("Hardware Initialized failed",level = "ERROR")
       return None
 
+  def rest_nextscreen(self,kwargs):
+    if self.debug: self.log("pixelit_nextscreen: " +str(kwargs))
+    self.cancel_timer(self.nextLoop)
+    self.playlist_loop(self)
+    return response, 200
+
   def rest_add(self,kwargs):
     if self.debug: self.log("pixelit_add: " +str(kwargs))
     try:
@@ -46,25 +52,19 @@ class pixelIT(hass.Hass):
     if self.debug: self.log("pixelit_sleepmode: " +str(kwargs))
     try:
       if kwargs.get("sleepMode") != None:
-        response = self.display(kwargs)
+        self.display(kwargs)
+        self.sleepmode = kwargs.get("sleepMode")
+        if self.sleepmode == True:
+          self.cancel_timer(self.nextLoop)
+          self.log("timer after del: " +str(self.nextLoop))
+        else:
+          self.playlist_loop()
+        response = requests.post('http://' + self.args["ip"] + '/api/config', headers={'Content-Type': 'application/data'})
         return response, 200
     except:
       self.log("Unable to set sleepmode",level = "ERROR")
       response = {"error": "no sleepmode provided"}
       return response, 400
-
-  def rest_update_color(self,kwargs):
-    if self.debug: self.log("rest_color: " +str(kwargs))
-    try:
-      for msg in self.playlist:
-        if msg["screen"] == kwargs["title"]:
-          msg["text"]["color"]["r"] = kwargs["r"] 
-          msg["text"]["color"]["g"] = kwargs["g"]
-          msg["text"]["color"]["b"] = kwargs["b"]
-      return response, 200
-    except:
-      self.log("Unable to update color",level = "ERROR")
-      response = {"error": "screen not deleted"}
 
   def rest_sensor(self,kwargs):
     try: 
@@ -104,9 +104,9 @@ class pixelIT(hass.Hass):
       response = {"error": "screen not deleted"}
       return response, 400  
 
-  def rest_update_message(self,kwargs):
+  def rest_update(self,kwargs):
     found = False
-    if self.debug: self.log("rest_update_message: " + str(kwargs))
+    if self.debug: self.log("rest_update: " + str(kwargs))
     try:
       for msg in self.playlist:
         if msg["screen"] == kwargs["title"]:
@@ -140,8 +140,8 @@ class pixelIT(hass.Hass):
     self.register_endpoint(self.rest_add, "pixelit_add")
     self.register_endpoint(self.rest_sleepmode, "pixelit_sleepmode")
     self.register_endpoint(self.rest_delete, "pixelit_delete")
-    self.register_endpoint(self.rest_update_message, "pixelit_update_message")
-    self.register_endpoint(self.rest_update_color, "pixelit_update_color")
+    self.register_endpoint(self.rest_nextscreen, "pixelit_nextscreen")
+    self.register_endpoint(self.rest_update, "pixelit_update")
     self.register_endpoint(self.rest_sensor, "pixelit_sensor")
     if self.debug: self.register_endpoint(self.rest_playlist, "pixelit_playlist")
     self.push_config()
@@ -157,11 +157,9 @@ class pixelIT(hass.Hass):
 
   def playlist_add(self,msg):
     try: 
-      if msg["seconds"] < 5:
-        msg["seconds"] = 5
       if msg.get("target") == "alert":
         if self.debug: self.log("alert: " +msg["text"]["textString"])
-        msg["seconds"] = 20
+        msg["lifetime"] = 20
         self.alertMsg = msg
         self.cancel_timer(self.nextLoop)
         self.nextLoop = self.run_in(self.playlist_loop, 1)
@@ -174,11 +172,12 @@ class pixelIT(hass.Hass):
 
   def playlist_loop(self, kwargs):
     if self.debug: self.log("Loop")
+    if self.sleepmode == True: return
     self.showAlert = not self.showAlert
     if (self.alertMsg is not None) and self.showAlert:
       if self.debug: self.log("Show alert")
       self.display(self.alertMsg)
-      self.nextLoop = self.run_in(self.playlist_loop, self.alertMsg["seconds"])
+      self.nextLoop = self.run_in(self.playlist_loop, self.alertMsg["lifetime"])
       if (self.AlertMsg["repeat"] > 0): 
         self.AlertMsg["repeat"] -= 1
       else:
@@ -187,12 +186,12 @@ class pixelIT(hass.Hass):
     if (self.warningMsg is not None) and not self.showAlert:
       if self.debug: self.log("Show warning")
       self.display(self.warningMsg)
-      self.nextLoop = self.run_in(self.playlist_loop, self.warningMsg["seconds"])
+      self.nextLoop = self.run_in(self.playlist_loop, self.warningMsg["lifetime"])
       if (self.warningMsg["repeat"] > 0): self.warningMsg["repeat"] -= 1
       if (self.warningMsg["repeat"] > 0): 
         self.warningMsg["repeat"] -= 1
       else:
-        self.warningMsg=None  
+        self.warningMsg=None
       return
     if len(self.playlist) > 0:
       nowPlay = self.pointer
@@ -206,9 +205,9 @@ class pixelIT(hass.Hass):
       except:
         status = None        
       self.display(self.playlist[nowPlay])
-      self.nextLoop = self.run_in(self.playlist_loop, self.playlist[nowPlay]["seconds"])
+      self.nextLoop = self.run_in(self.playlist_loop, self.playlist[nowPlay]["lifetime"])
       if self.playlist[nowPlay]["repeat"] == 0:
-        if self.debug: self.log("last time: "+self.playlist[nowPlay]["text"]["textString"])
+        if self.debug: self.log("last time: "+self.playlist[nowPlay]["screen"] + " "+self.playlist[nowPlay]["text"]["textString"])
         self.playlist.pop(nowPlay)
         if self.debug: self.log("playlist length =>"+str(len(self.playlist)))
       if nowPlay < len(self.playlist):
