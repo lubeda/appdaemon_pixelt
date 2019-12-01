@@ -4,7 +4,7 @@ The original developer provides a node-red flow to do so.
 The wiki is in german, to download the firmware use this link [ESP8266-Firmware](https://www.bastelbunker.de/wp-content/uploads/PixelIt.zip)
 
 ## Homeassistant
-I did not manage to feed data via node-red to the display so i started to develop an appdaemon class for this task. The result is in an early stage but is working.
+I did not manage to feed data via node-red to the display so i started to develop an appdaemon class for this task. The result is in an early stage but is working. See a demo on [Youtube](https://youtu.be/CrZR8chQrP4).
 
 ### concept
 

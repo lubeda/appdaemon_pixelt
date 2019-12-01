@@ -55,11 +55,12 @@ class pixelIT(hass.Hass):
         self.display(kwargs)
         self.sleepmode = kwargs.get("sleepMode")
         if self.sleepmode == True:
-          self.cancel_timer(self.nextLoop)
           self.log("timer after del: " +str(self.nextLoop))
+          self.cancel_timer(self.nextLoop)
         else:
-          self.playlist_loop()
-        response = requests.post('http://' + self.args["ip"] + '/api/config', headers={'Content-Type': 'application/data'})
+          self.playlist_loop(self)
+        #response = requests.get('http://' + self.args["ip"] + '/api/config', headers={'Content-Type': 'application/data'})
+        response = {"sleepMode":  self.sleepmode}
         return response, 200
     except:
       self.log("Unable to set sleepmode",level = "ERROR")
