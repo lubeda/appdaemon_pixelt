@@ -33,6 +33,9 @@ class pixelIT(hass.Hass):
 
   def rest_add(self,kwargs):
     if self.debug: self.log("pixelit_add: " +str(kwargs))
+    if self.sleepMode == False and self.nextLoop == None:
+      if self.debug: self.log("retriggering loop")
+      self.nextLoop = self.run_in(self.playlist_loop, 1)
     try:
       data = self.load_template(kwargs["title"]+".json")
       if len(kwargs["message"]) and (kwargs["title"] != "clock"):
@@ -48,23 +51,23 @@ class pixelIT(hass.Hass):
       response = {"error": "message or title missing"}
       return response, 400
 
-  def rest_sleepmode(self,kwargs):
-    if self.debug: self.log("pixelit_sleepmode: " +str(kwargs))
+  def rest_sleepMode(self,kwargs):
+    if self.debug: self.log("pixelit_sleepMode: " +str(kwargs))
     try:
       if kwargs.get("sleepMode") != None:
         self.display(kwargs)
-        self.sleepmode = kwargs.get("sleepMode")
-        if self.sleepmode == True:
+        self.sleepMode = kwargs.get("sleepMode")
+        if self.sleepMode == True:
           self.log("timer after del: " +str(self.nextLoop))
           self.cancel_timer(self.nextLoop)
         else:
           self.playlist_loop(self)
         #response = requests.get('http://' + self.args["ip"] + '/api/config', headers={'Content-Type': 'application/data'})
-        response = {"sleepMode":  self.sleepmode}
+        response = {"sleepMode":  self.sleepMode}
         return response, 200
     except:
-      self.log("Unable to set sleepmode",level = "ERROR")
-      response = {"error": "no sleepmode provided"}
+      self.log("Unable to set sleepMode",level = "ERROR")
+      response = {"error": "no sleepMode provided"}
       return response, 400
 
   def rest_sensor(self,kwargs):
@@ -133,13 +136,13 @@ class pixelIT(hass.Hass):
     self.playlist= []
     self.debug = True
     self.sleepMode = False
-    self.rest_sleepmode({"sleepMode":self.sleepMode})
+    self.rest_sleepMode({"sleepMode":self.sleepMode})
     self.pointer = 0
     self.showAlert = True
     self.alertMsg = None
     self.warningMsg = None
     self.register_endpoint(self.rest_add, "pixelit_add")
-    self.register_endpoint(self.rest_sleepmode, "pixelit_sleepmode")
+    self.register_endpoint(self.rest_sleepMode, "pixelit_sleepmode")
     self.register_endpoint(self.rest_delete, "pixelit_delete")
     self.register_endpoint(self.rest_nextscreen, "pixelit_nextscreen")
     self.register_endpoint(self.rest_update, "pixelit_update")
@@ -173,7 +176,9 @@ class pixelIT(hass.Hass):
 
   def playlist_loop(self, kwargs):
     if self.debug: self.log("Loop")
-    if self.sleepmode == True: return
+    if self.sleepMode == True: 
+      if self.debug: self.log("No Loop because i'm sleeping")
+      return
     self.showAlert = not self.showAlert
     if (self.alertMsg is not None) and self.showAlert:
       if self.debug: self.log("Show alert")

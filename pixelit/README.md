@@ -1,6 +1,6 @@
 # appdaemon_pixelt
 There is a marvelous project [PixelIT](https://www.bastelbunker.de/pixel-it/) which is a 8x32bit RGB WLAN LED matrix to display text and graphics for around 50€. The screen is more or less dumb, you have to feed it with data by a server.
-The original developer provides a node-red flow to do so.
+The original developer provides a node-red flow to do so. The hardware and firmware is original from this website.
 The wiki is in german, to download the firmware use this link [ESP8266-Firmware](https://www.bastelbunker.de/wp-content/uploads/PixelIt.zip)
 
 ## Homeassistant
