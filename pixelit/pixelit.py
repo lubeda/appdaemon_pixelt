@@ -43,6 +43,14 @@ class pixelIT(hass.Hass):
       if kwargs.get("target") != None:
         data["target"] = kwargs["target"]
         if data["target"] == "warning": data["repeat"] *= 2
+      # play sound once
+      if data.get("sound") != None:
+        sound= {} 
+        sound["sound"] = data.pop("sound")
+        if self.debug: self.log("pixelit_add: sound" +str(sound))
+        self.display(sound)
+      else:
+        if self.debug: self.log("pixelit_add: kein sound")
       self.playlist_add(data)
       response = {"length playlist": len(self.playlist)}
       return response, 200
@@ -53,6 +61,9 @@ class pixelIT(hass.Hass):
 
   def rest_sleepMode(self,kwargs):
     if self.debug: self.log("pixelit_sleepMode: " +str(kwargs))
+    response = requests.get('http://' + self.args["ip"] + '/api/config', headers={'Content-Type': 'application/json'})
+    if self.debug: self.log("responcsex: " + str(response))
+        
     try:
       if kwargs.get("sleepMode") != None:
         self.display(kwargs)
@@ -62,7 +73,6 @@ class pixelIT(hass.Hass):
           self.cancel_timer(self.nextLoop)
         else:
           self.playlist_loop(self)
-        #response = requests.get('http://' + self.args["ip"] + '/api/config', headers={'Content-Type': 'application/data'})
         response = {"sleepMode":  self.sleepMode}
         return response, 200
     except:
@@ -116,9 +126,12 @@ class pixelIT(hass.Hass):
         if msg["screen"] == kwargs["title"]:
           found = True
           template = self.load_template(kwargs["title"]+".json")
-          for key in kwargs:
-            if key=="message":
-              template["text"]["textString"] = kwargs["message"]
+          if template != None:
+            for key in kwargs:
+              if key=="message":
+                template["text"]["textString"] = kwargs["message"]
+          else:
+            if self.debug: self.log("screen not found: " + kwargs["title"])
       response = {"playlist": len(self.playlist)}
       if found:
         return response, 200

@@ -1,1 +1,1 @@
-Documentation is in the the **apps** folder
+Documentation is in the the **pixelit** folder

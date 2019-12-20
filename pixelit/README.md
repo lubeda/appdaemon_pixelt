@@ -65,7 +65,7 @@ rest_command:
     payload: '{"title": "{{ title }}","message": "{{ message }}"}'
     content_type: 'application/json; charset=utf-8'
 
-pixelit_next:
+  pixelit_next:
     url: http://192.168.178.47:5050/api/appdaemon/pixelit_next
     method: POST
     payload: '{}'
@@ -132,6 +132,11 @@ message| new display text
 *service:* rest_command.pixelit_next
 
 switch to next screen. decreases the repeat counter of the actual screen!!
+
+#### Sound
+
+The new [beta](https://forum.bastelbunker.de/d/79-support-f-r-dfplayer-mini-mp3-player/12) of pixelIt supports mp3 playback via a DFPlayer Module. If you use sound in your templates, the sound is only played once, directly when you add the template to the loop.
+
 
 #### On screen names
 
