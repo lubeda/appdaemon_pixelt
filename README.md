@@ -1,1 +1,1 @@
-Documentation is in the the **pixelit** folder
+deprecated see [repo](https://github.com/lubeda/PixelIt-hacs
