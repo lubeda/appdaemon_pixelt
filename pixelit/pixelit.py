@@ -33,13 +33,15 @@ class pixelIT(hass.Hass):
 
   def rest_add(self,kwargs):
     if self.debug: self.log("pixelit_add: " +str(kwargs))
+
     if self.sleepMode == False and self.nextLoop == None:
       if self.debug: self.log("retriggering loop")
       self.nextLoop = self.run_in(self.playlist_loop, 1)
+      
     try:
       data = self.load_template(kwargs["title"]+".json")
       if len(kwargs["message"]) and (kwargs["title"] != "clock"):
-        data["text"]["textString"] = kwargs["message"] 
+        data["text"]["textString"] = kwargs["message"]
       if kwargs.get("target") != None:
         data["target"] = kwargs["target"]
         if data["target"] == "warning": data["repeat"] *= 2
@@ -62,7 +64,7 @@ class pixelIT(hass.Hass):
   def rest_sleepMode(self,kwargs):
     if self.debug: self.log("pixelit_sleepMode: " +str(kwargs))
     response = requests.get('http://' + self.args["ip"] + '/api/config', headers={'Content-Type': 'application/json'})
-    if self.debug: self.log("responcsex: " + str(response))
+    if self.debug: self.log("response: " + str(response))
         
     try:
       if kwargs.get("sleepMode") != None:
@@ -167,7 +169,7 @@ class pixelIT(hass.Hass):
   def display(self,msg):
     if self.debug: self.log("display: " + json.dumps(msg))
     try: 
-      r = requests.post(self.url,data=json.dumps(msg), headers={'Content-Type': 'application/data'})
+      r = requests.post(self.url,data=json.dumps(msg, ensure_ascii=False).encode('utf8'), headers={'Content-Type': 'application/data'})
       if self.debug: self.log("display return: " +r.text)
     except:
       self.log("Error while sending to display.",level="ERROR")
@@ -184,6 +186,7 @@ class pixelIT(hass.Hass):
         self.warningMsg = msg
       else:
         self.playlist.append(msg)
+        self.pointer = len(self.playlist)-1
     except:
       self.log("Unable to add to playlist",level="ERROR")
 
